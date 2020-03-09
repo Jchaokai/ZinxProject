@@ -1,0 +1,10 @@
+{
+  "Host":"127.0.0.1",
+  "Port": 8999,
+  "Name" : "Zinx",
+
+
+  "MaxConn" : 100,
+  "MaxPackageSize": 8192,
+  "WorkPoolSize" : 4
+}
