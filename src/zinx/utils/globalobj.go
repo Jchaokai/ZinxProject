@@ -34,7 +34,7 @@ func init() {
 		Port:              8999,
 		Name:              "ZinxDemo",
 		Version:           "V0.8",
-		MaxConn:           10000,
+		MaxConn:           5000,
 		MaxPackageSize:    4096,
 		WorkPoolSize:      4,
 		MaxWorkerTaskSize: 1024,

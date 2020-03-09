@@ -14,10 +14,12 @@ import (
 )
 
 type Connection struct {
-	Conn     *net.TCPConn
-	ConnID   uint64
-	isClosed bool
-	//由 reader 告知 writer 推出chan
+	//当前conn属于哪个 server
+	TcpServer ziface.IServer
+	Conn      *net.TCPConn
+	ConnID    uint64
+	isClosed  bool
+	//由 reader 告知 writer 退出的chan
 	ExitChan chan bool
 	//该链接处理业务的router
 	MsgHandler ziface.IMsgHandler
@@ -66,7 +68,7 @@ func (c *Connection) StartReader() {
 		if utils.GlobalObject.WorkPoolSize > 0 {
 			//将request交给工作池
 			c.MsgHandler.SendMsgToTaskQueue(request)
-		}else{
+		} else {
 			//如果用户不适用worker pool,直接开协程处理
 			go c.MsgHandler.DoMsgHandle(request)
 		}
@@ -108,9 +110,9 @@ func (c *Connection) StartWriter() {
 }
 
 func (c *Connection) Start() {
-	//TODO 启动 读客户端goroutine
+	//启动 读客户端goroutine
 	go c.StartReader()
-	//TODO 启动 写客户端goroutine
+	//启动 写客户端goroutine
 	go c.StartWriter()
 
 }
@@ -124,6 +126,8 @@ func (c *Connection) Stop() {
 	_ = c.Conn.Close()
 	//告知 client-handle writer 关闭
 	c.ExitChan <- true
+	//将当前conn 从 connManager删除
+	c.TcpServer.GetConnManager().Remove(c)
 	//回收资源
 	close(c.ExitChan)
 	close(c.MsgChan)
@@ -141,8 +145,9 @@ func (c *Connection) GetRemoteAddr() net.Addr {
 	return c.Conn.RemoteAddr()
 }
 
-func NewConnection(conn *net.TCPConn, connID uint64, msgHandle ziface.IMsgHandler) *Connection {
-	return &Connection{
+func NewConnection(tcpServer ziface.IServer, conn *net.TCPConn, connID uint64, msgHandle ziface.IMsgHandler) *Connection {
+	c := &Connection{
+		TcpServer:  tcpServer,
 		Conn:       conn,
 		ConnID:     connID,
 		isClosed:   false,
@@ -150,4 +155,7 @@ func NewConnection(conn *net.TCPConn, connID uint64, msgHandle ziface.IMsgHandle
 		MsgChan:    make(chan []byte),
 		MsgHandler: msgHandle,
 	}
+	//将conn 加入 connManager
+	c.TcpServer.GetConnManager().Add(c)
+	return c
 }
