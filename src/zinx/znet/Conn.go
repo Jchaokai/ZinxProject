@@ -110,11 +110,11 @@ func (c *Connection) StartWriter() {
 }
 
 func (c *Connection) Start() {
-	//启动 读客户端goroutine
 	go c.StartReader()
-	//启动 写客户端goroutine
 	go c.StartWriter()
 
+	//conn连接后，调用hook函数
+	c.TcpServer.CallOnConnStart(c)
 }
 
 func (c *Connection) Stop() {
@@ -123,6 +123,9 @@ func (c *Connection) Stop() {
 		return
 	}
 	c.isClosed = true
+
+	//在conn断开连接前，调用hook函数
+	c.TcpServer.CallOnConnStop(c)
 	_ = c.Conn.Close()
 	//告知 client-handle writer 关闭
 	c.ExitChan <- true

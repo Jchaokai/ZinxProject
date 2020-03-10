@@ -18,6 +18,10 @@ type Server struct {
 	MsgHandler ziface.IMsgHandler
 	//server的连接管理器
 	connManager ziface.IConnManager
+	//conn连接后自动调用的hook函数
+	OnConnStart func(conn ziface.IConn)
+	//conn关闭后自动调用的hook函数
+	OnConnStop func(conn ziface.IConn)
 }
 
 func (s *Server) Start() {
@@ -100,4 +104,32 @@ func NewServer() ziface.IServer {
 
 func (s *Server) GetConnManager() ziface.IConnManager {
 	return s.connManager
+}
+
+//注册 OnConnStart hook函数
+func (s *Server) SetOnConnStart(hookFunc func(conn ziface.IConn)) {
+	s.OnConnStart = hookFunc
+}
+
+//注册 OnConnStop hook函数
+func (s *Server) SetOnConnStop(hookFunc func(conn ziface.IConn)) {
+	s.OnConnStop = hookFunc
+}
+
+//调用 OnConnStart hook函数
+func (s *Server) CallOnConnStart(conn ziface.IConn) {
+	if s.OnConnStart != nil {
+		fmt.Printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n"+
+			"conn [ %s ] hookFunc [ CallOnConnStart ] ing ing . . .  \n", conn.GetRemoteAddr().String())
+		s.OnConnStart(conn)
+	}
+}
+
+//调用 OnConnStart hook函数
+func (s *Server) CallOnConnStop(conn ziface.IConn) {
+	if s.OnConnStop != nil {
+		fmt.Printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n"+
+			"conn [ %s ] hookFunc [ CallOnConnStop ] ing ing . . .  \n", conn.GetRemoteAddr().String())
+		s.OnConnStop(conn)
+	}
 }

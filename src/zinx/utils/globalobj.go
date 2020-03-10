@@ -44,7 +44,7 @@ func init() {
 }
 
 func (GlobalObject *GlobalObj) reload() {
-	bytes, e := ioutil.ReadFile("F:\\GoProgram\\src\\ZinxProject\\src\\zinx\\zinx.json")
+	bytes, e := ioutil.ReadFile("F:\\GoProgram\\src\\ZinxProject\\src\\zinx.json")
 	if e != nil {
 		panic(e)
 	}
