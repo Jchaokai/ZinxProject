@@ -18,7 +18,13 @@ type IConn interface {
 	//获取当前远程客户端 IP Port TCP状态
 	GetRemoteAddr() net.Addr
 	//发送数据
-	SendMsg(uint64,[]byte) error
+	SendMsg(uint64, []byte) error
+	//设置自定义属性
+	SetProperty(key string, value interface{})
+	//获取自定义属性
+	GetProperty(key string) (interface{}, error)
+	//删除自定义属性
+	RemoveProperty(key string)
 }
 
 //定义一个处理连接业务的方法

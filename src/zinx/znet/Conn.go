@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"sync"
 )
 
 type Connection struct {
@@ -21,10 +22,14 @@ type Connection struct {
 	isClosed  bool
 	//由 reader 告知 writer 退出的chan
 	ExitChan chan bool
-	//该链接处理业务的router
+	//处理该链接业务的router
 	MsgHandler ziface.IMsgHandler
 	//读写分离之间的 channel
 	MsgChan chan []byte
+	//用户自定义属性集合
+	Properties map[string]interface{}
+	//用户自定义属性集合的 锁
+	PropLock sync.RWMutex
 }
 
 //读客户端数据
@@ -148,7 +153,36 @@ func (c *Connection) GetRemoteAddr() net.Addr {
 	return c.Conn.RemoteAddr()
 }
 
+func (c *Connection) SetProperty(key string, value interface{}) {
+	c.PropLock.Lock()
+	defer c.PropLock.Unlock()
+	if _, ok := c.Properties[key]; ok {
+		fmt.Println("property is EXIST")
+		return
+	} else {
+		c.Properties[key] = value
+	}
+}
+
+func (c *Connection) GetProperty(key string) (interface{}, error) {
+	c.PropLock.RLock()
+	defer c.PropLock.RUnlock()
+	if v, ok := c.Properties[key]; ok {
+		return v, nil
+	} else {
+		return nil, errors.New("property NOT FOUND")
+	}
+}
+
+func (c *Connection) RemoveProperty(key string) {
+	c.PropLock.Lock()
+	defer c.PropLock.Unlock()
+	delete(c.Properties, key)
+
+}
 func NewConnection(tcpServer ziface.IServer, conn *net.TCPConn, connID uint64, msgHandle ziface.IMsgHandler) *Connection {
+	{
+	}
 	c := &Connection{
 		TcpServer:  tcpServer,
 		Conn:       conn,
@@ -157,6 +191,7 @@ func NewConnection(tcpServer ziface.IServer, conn *net.TCPConn, connID uint64, m
 		ExitChan:   make(chan bool, 1),
 		MsgChan:    make(chan []byte),
 		MsgHandler: msgHandle,
+		Properties: make(map[string]interface{}),
 	}
 	//将conn 加入 connManager
 	c.TcpServer.GetConnManager().Add(c)
