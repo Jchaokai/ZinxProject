@@ -75,7 +75,7 @@ func (p *Player) SendMsg(msgID uint32, data proto.Message) {
 		fmt.Println("proto marshal error", e)
 		return
 	}
-	//将二进制通过zinx的sendMsg 发送给客户端
+	//通过zinx的sendMsg 将二进制发送给客户端
 	if p.Conn == nil {
 		fmt.Println("conn of player is closed,dont send proto_bytes", e)
 		return
@@ -83,5 +83,21 @@ func (p *Player) SendMsg(msgID uint32, data proto.Message) {
 	if e := p.Conn.SendMsg(msgID, bytes); e != nil {
 		fmt.Println("player sendMsg error !!", e)
 		return
+	}
+}
+
+//广播世界聊天消息
+func (p *Player) Talk(content string) {
+	//组建一个msgID:200 的proto数据
+	protoMsg := &proto2.BroadCast{
+		Pid:  p.Pid,
+		Tp:   1,
+		Data: &proto2.BroadCast_Content{Content: content},
+	}
+	//得到所有在线玩家
+	allPlayers := WorldObj.GetAllPlayers()
+	//发送
+	for _, play := range allPlayers {
+		go play.SendMsg(200, protoMsg)
 	}
 }
