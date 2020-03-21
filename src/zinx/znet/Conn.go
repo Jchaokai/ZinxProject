@@ -18,7 +18,7 @@ type Connection struct {
 	//当前conn属于哪个 server
 	TcpServer ziface.IServer
 	Conn      *net.TCPConn
-	ConnID    uint64
+	ConnID    uint32
 	isClosed  bool
 	//由 reader 告知 writer 退出的chan
 	ExitChan chan bool
@@ -81,7 +81,7 @@ func (c *Connection) StartReader() {
 }
 
 //要发送的数据先封装，在发送给MsgChan,供client-handle writer使用
-func (c *Connection) SendMsg(msgId uint64, data []byte) error {
+func (c *Connection) SendMsg(msgId uint32, data []byte) error {
 	if c.isClosed {
 		return errors.New("conn closed when send msg")
 	}
@@ -145,7 +145,7 @@ func (c *Connection) GetTcpConn() *net.TCPConn {
 	return c.Conn
 }
 
-func (c *Connection) GetConnID() uint64 {
+func (c *Connection) GetConnID() uint32 {
 	return c.ConnID
 }
 
@@ -180,7 +180,7 @@ func (c *Connection) RemoveProperty(key string) {
 	delete(c.Properties, key)
 
 }
-func NewConnection(tcpServer ziface.IServer, conn *net.TCPConn, connID uint64, msgHandle ziface.IMsgHandler) *Connection {
+func NewConnection(tcpServer ziface.IServer, conn *net.TCPConn, connID uint32, msgHandle ziface.IMsgHandler) *Connection {
 	{
 	}
 	c := &Connection{

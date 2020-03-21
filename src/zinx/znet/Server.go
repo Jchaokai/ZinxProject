@@ -47,7 +47,7 @@ func (s *Server) Start() {
 		}
 		fmt.Println(s.Name, " [start success !!!]")
 
-		var connID uint64
+		var connID uint32
 		connID = 0
 		//阻塞等待 客户端连接 处理一些业务
 		for {
@@ -87,7 +87,7 @@ func (s *Server) Server() {
 	select {}
 }
 
-func (s *Server) AddRouter(msgID uint64, r ziface.IRouter) {
+func (s *Server) AddRouter(msgID uint32, r ziface.IRouter) {
 	s.MsgHandler.AddRouter(msgID, r)
 }
 

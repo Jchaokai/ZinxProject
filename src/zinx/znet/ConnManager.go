@@ -8,13 +8,13 @@ import (
 )
 
 type ConnManager struct {
-	Conns    map[uint64]ziface.IConn //管理的连接集合
+	Conns    map[uint32]ziface.IConn //管理的连接集合
 	ConnLock sync.RWMutex            //保护连接集合的读写锁
 }
 
 func NewConnManager() *ConnManager {
 	return &ConnManager{
-		Conns: make(map[uint64]ziface.IConn),
+		Conns: make(map[uint32]ziface.IConn),
 	}
 }
 
@@ -39,7 +39,7 @@ func (cm *ConnManager) Remove(conn ziface.IConn) {
 		conn.GetConnID(), conn.GetRemoteAddr(), cm.Len())
 }
 
-func (cm *ConnManager) Get(connID uint64) (ziface.IConn, error) {
+func (cm *ConnManager) Get(connID uint32) (ziface.IConn, error) {
 	//加 读锁
 	cm.ConnLock.RLock()
 	defer cm.ConnLock.RUnlock()
@@ -51,8 +51,8 @@ func (cm *ConnManager) Get(connID uint64) (ziface.IConn, error) {
 	}
 }
 
-func (cm *ConnManager) Len() uint64 {
-	return uint64(len(cm.Conns))
+func (cm *ConnManager) Len() uint32 {
+	return uint32(len(cm.Conns))
 }
 
 func (cm *ConnManager) ClearConn() {

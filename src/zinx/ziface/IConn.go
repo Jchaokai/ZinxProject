@@ -14,11 +14,11 @@ type IConn interface {
 	//获取当前连接的socket
 	GetTcpConn() *net.TCPConn
 	//获取当前连接的ID
-	GetConnID() uint64
+	GetConnID() uint32
 	//获取当前远程客户端 IP Port TCP状态
 	GetRemoteAddr() net.Addr
 	//发送数据
-	SendMsg(uint64, []byte) error
+	SendMsg(uint32, []byte) error
 	//设置自定义属性
 	SetProperty(key string, value interface{})
 	//获取自定义属性

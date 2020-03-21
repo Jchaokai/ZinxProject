@@ -18,10 +18,10 @@ type GlobalObj struct {
 	Name      string `json:"Name"`
 	//关于zinx配置
 	Version           string `json:"Version"`
-	MaxConn           uint64 `json:"MaxConn"`
-	MaxPackageSize    uint64 `json:"MaxPackageSize"`
-	WorkPoolSize      uint64 `json:"WorkPoolSize"`      //Zinx 框架允许用户最多开辟多少个worker
-	MaxWorkerTaskSize uint64 `json:"MaxWorkerTaskSize"` //每个worker 对应的消息队列的最大任务数
+	MaxConn           uint32 `json:"MaxConn"`
+	MaxPackageSize    uint32 `json:"MaxPackageSize"`
+	WorkPoolSize      uint32 `json:"WorkPoolSize"`      //Zinx 框架允许用户最多开辟多少个worker
+	MaxWorkerTaskSize uint32 `json:"MaxWorkerTaskSize"` //每个worker 对应的消息队列的最大任务数
 }
 
 //定义一个全局对外 的GlobalObj
@@ -44,7 +44,7 @@ func init() {
 }
 
 func (GlobalObject *GlobalObj) reload() {
-	bytes, e := ioutil.ReadFile("F:\\GoProgram\\src\\ZinxProject\\src\\zinx.json")
+	bytes, e := ioutil.ReadFile("F:\\GoProgram\\src\\ZinxProject\\src\\mmo_game_zinx\\conf\\zinx.json")
 	if e != nil {
 		panic(e)
 	}

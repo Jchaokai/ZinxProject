@@ -9,7 +9,7 @@ type IServer interface {
 	//run
 	Server()
 	//给当前的服务注册一个 路由方法，供client 连接使用
-	AddRouter(msgID uint64, r IRouter)
+	AddRouter(msgID uint32, r IRouter)
 	GetConnManager() IConnManager
 	//注册 OnConnStart hook函数
 	SetOnConnStart(func(conn IConn))

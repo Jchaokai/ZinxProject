@@ -9,16 +9,16 @@ import (
 
 type MsgHandler struct {
 	//不同msgID 对应的不同路由处理方法
-	Apis map[uint64]ziface.IRouter
+	Apis map[uint32]ziface.IRouter
 	//消息队列
 	TaskQueue []chan ziface.IRequest
 	//工作池
-	WorkPoolSize uint64
+	WorkPoolSize uint32
 }
 
 func NewMsgHandler() *MsgHandler {
 	return &MsgHandler{
-		Apis:         map[uint64]ziface.IRouter{},
+		Apis:         map[uint32]ziface.IRouter{},
 		WorkPoolSize: utils.GlobalObject.WorkPoolSize,
 		TaskQueue:    make([]chan ziface.IRequest, utils.GlobalObject.WorkPoolSize),
 	}
@@ -28,6 +28,7 @@ func (msgHandle *MsgHandler) DoMsgHandle(r ziface.IRequest) {
 	router, ok := msgHandle.Apis[r.GetMsgID()]
 	if !ok {
 		fmt.Println("msgID ", r.GetMsgID(), " --> API router [IS NOT FOUND] , is [Registering ing ...] ")
+		return
 		//msgHandle.AddRouter(r.GetMsgID(),new(BaseRouter))
 		//msgHandle.DoMsgHandle(r)
 	}
@@ -38,7 +39,7 @@ func (msgHandle *MsgHandler) DoMsgHandle(r ziface.IRequest) {
 	}(r)
 }
 
-func (msgHandle *MsgHandler) AddRouter(msgID uint64, r ziface.IRouter) {
+func (msgHandle *MsgHandler) AddRouter(msgID uint32, r ziface.IRouter) {
 	//1.当前msgID对应的router是否存在
 	if _, ok := msgHandle.Apis[msgID]; ok {
 		panic("repeat router ,msgID : " + strconv.Itoa(int(msgID)))
@@ -76,7 +77,7 @@ func (msgHandle *MsgHandler) SendMsgToTaskQueue(req ziface.IRequest) {
 	//将 消息平均分配（根据connID/ requestID）给不同的worker
 	workerID := req.GetConn().GetConnID() % msgHandle.WorkPoolSize
 	fmt.Printf("conn: %s connID: [%d] request is send to workerID : [%d] is solving\n",
-		req.GetConn().GetRemoteAddr().String(), req.GetConn().GetConnID(),workerID)
+		req.GetConn().GetRemoteAddr().String(), req.GetConn().GetConnID(), workerID)
 	//将request发送给对应的worker的taskQueue
 	msgHandle.TaskQueue[workerID] <- req
 }

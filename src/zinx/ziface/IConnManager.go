@@ -6,7 +6,7 @@ package ziface
 type IConnManager interface {
 	Add(conn IConn)
 	Remove(conn IConn)
-	Get(connID uint64) (IConn, error)
-	Len() uint64
+	Get(connID uint32) (IConn, error)
+	Len() uint32
 	ClearConn()
 }

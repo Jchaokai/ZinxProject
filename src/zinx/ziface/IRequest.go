@@ -8,5 +8,5 @@ type IRequest interface {
 	GetConn() IConn
 	//get连接的msg
 	GetData() []byte
-	GetMsgID() uint64
+	GetMsgID() uint32
 }

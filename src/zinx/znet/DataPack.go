@@ -15,9 +15,9 @@ func NewDataPack() *DataPack {
 	return &DataPack{}
 }
 
-//包头  16个字节，DataLen [uint64 (8个)] DataID [uint64 (8个)]
+//包头  8个字节，DataLen uint32 (4个) DataID uint32 (4个)
 func (dp *DataPack) GetHeadLen() uint {
-	return 16
+	return 8
 }
 
 func (dp *DataPack) Pack(msg ziface.IMessage) ([]byte, error) {
