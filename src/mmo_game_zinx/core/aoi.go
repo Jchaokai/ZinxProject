@@ -7,17 +7,11 @@ import "fmt"
 */
 
 type AOI struct {
-	//区域的左边界坐标
-	MinX int
-	//区域的右边界坐标
-	MaxX int
-	//区域的上边界坐标
-	MinY int
-	//区域的下边界坐标
-	MaxY int
-	//x方向格子的数量
+	MinX  int
+	MaxX  int
+	MinY  int
+	MaxY  int
 	NumsX int
-	//y方向格子的数量
 	NumsY int
 	//当前区域有哪些格子 map[格子ID]格子对象
 	grids map[int]*Grid
@@ -56,7 +50,7 @@ func (a *AOI) gridHeight() int {
 	return (a.MaxY - a.MinY) / a.NumsY
 }
 
-func (a *AOI) GetSurroundingByGid(centerID int) (grids []*Grid) {
+func (a *AOI) getSurroundingByGid(centerID int) (grids []*Grid) {
 	//判断gid是否在AOI中
 	if _, ok := a.grids[centerID]; !ok {
 		return
@@ -93,8 +87,8 @@ func (a *AOI) GetSurroundingByGid(centerID int) (grids []*Grid) {
 }
 
 func (a *AOI) GetGIDByPos(x, y float32) (GID int) {
-	idx := int(x) - a.MinX/a.gridWidth()
-	idy := int(y) - a.MinY/a.gridHeight()
+	idx := (int(x) - a.MinX) / a.gridWidth()
+	idy := (int(y) - a.MinY) / a.gridHeight()
 	GID = idy*a.NumsX + idx
 	return
 }
@@ -103,34 +97,38 @@ func (a *AOI) GetPlayerIDsByPos(x, y float32) (playerIDs []int) {
 	//得到玩家所处的GID格子编号
 	GID := a.GetGIDByPos(x, y)
 	//通过GID周边九宫格信息
-	grids := a.GetSurroundingByGid(GID)
-	//将九宫格的信息全部的players放在playerIDs []int
+	grids := a.getSurroundingByGid(GID)
+	//将九宫格的信息全部的players放在playerIDs []int`
 	for _, grid := range grids {
 		playerIDs = append(playerIDs, grid.GetPlayersIDs()...)
-		fmt.Println("==========>发现玩家 ： ", grid.GetPlayersIDs())
+		if grid.GetPlayersIDs() != nil {
+			fmt.Println("==========>发现玩家 ： ", grid.GetPlayersIDs())
+		}
 	}
 	return
 }
 
-func (a *AOI) GetPlayersByGid(gid int) (playerIDs []int) {
-	grids := a.GetSurroundingByGid(gid)
+func (a *AOI) getPidsByGid(gid int) (playerIDs []int) {
+	grids := a.getSurroundingByGid(gid)
 	for _, grid := range grids {
 		playerIDs = append(playerIDs, grid.GetPlayersIDs()...)
 	}
 	return
 }
 
-func (a *AOI) AddPlayerToGrid(pid int, gid int) {
+func (a *AOI) addPlayerToGrid(pid int, gid int) {
 	a.grids[gid].Add(pid)
 }
 
-func (a *AOI) RemovePlayFromGrid(pid int, gid int) {
+func (a *AOI) removePlayFromGrid(pid int, gid int) {
 	a.grids[gid].Remove(pid)
 }
 
 //通过物理坐标将一个player添加到一个格子中
 func (a *AOI) AddPlayerToGridByPos(pid int, x, y float32) {
-	a.grids[a.GetGIDByPos(x, y)].Add(pid)
+	GID := a.GetGIDByPos(x, y)
+	grid := a.grids[GID]
+	grid.Add(pid)
 }
 
 //通过物理坐标将一个格子中的player删除

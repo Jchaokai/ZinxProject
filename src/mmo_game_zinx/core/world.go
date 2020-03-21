@@ -20,7 +20,7 @@ type World struct {
 func init() {
 	//游戏的全部地图
 	WorldObj = &World{
-		Aoi:     NewAOI(0, 10000, 0, 10000, 200, 200),
+		Aoi:     NewAOI(100, 1000, 100, 1000, 18, 18),
 		Players: make(map[int32]*Player),
 	}
 }
@@ -31,13 +31,13 @@ func (w *World) AddPlayer(player *Player) {
 	defer w.plock.Unlock()
 	w.Players[player.Pid] = player
 	//将player添加到格子中
-	w.Aoi.AddPlayerToGridByPos(int(player.Pid), player.x, player.z)
+	w.Aoi.AddPlayerToGridByPos(int(player.Pid), player.X, player.Z)
 }
 
 //删除一个玩家
 func (w *World) RemovePlayerByPid(pid int32) {
 	player := w.Players[pid]
-	w.Aoi.RemovePlayFromGridByPos(int(pid), player.x, player.z)
+	w.Aoi.RemovePlayFromGridByPos(int(pid), player.X, player.Z)
 	w.plock.Lock()
 	defer w.plock.Unlock()
 	delete(w.Players, pid)
