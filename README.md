@@ -1,5 +1,13 @@
 # ZinxProject
 
-&emsp;golang 写的游戏服务端（TCP）
+- 后端服务器定义域
 
-&emsp;[参考：https://github.com/aceld/zinx](https://github.com/aceld/zinx)
+- 使用服务器API、protobuf协议功能开发
+
+    服务器定义思路导图：
+
+    
+
+    功能开发思路导图：
+
+    ![功能开发开发思路导图](https://github.com/Jchaokai/ZinxProject/blob/master/images/MMO_Design.png)
