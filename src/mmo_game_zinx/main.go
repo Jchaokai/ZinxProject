@@ -23,11 +23,26 @@ func OnConn(conn ziface.IConn) {
 	//刚刚上线时，告知周围玩家已经上线，广播当前玩家的位置信息
 	player.SyncSurrounding()
 }
+func OnStop(conn ziface.IConn) {
+	//当前连接对应哪个玩家
+	pid, e := conn.GetProperty("pid")
+	if e != nil {
+		fmt.Println("conn get pid error ", e)
+	}
+	player := core.WorldObj.GetPlayerByID(pid.(int32))
+	//玩家下线处理
+	player.Offline()
+
+	conn.Stop()
+}
 func main() {
 	server := znet.NewServer()
-	//连接创建时的hook函数
+	//hook函数
 	server.SetOnConnStart(OnConn)
+	server.SetOnConnStop(OnStop)
+
 	server.AddRouter(2, &apis.WorldChatRouter{})
 	server.AddRouter(3, &apis.MoveRouter{})
+
 	server.Server()
 }

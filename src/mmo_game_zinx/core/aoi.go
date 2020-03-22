@@ -101,9 +101,9 @@ func (a *AOI) GetPlayerIDsByPos(x, y float32) (playerIDs []int) {
 	//将九宫格的信息全部的players放在playerIDs []int`
 	for _, grid := range grids {
 		playerIDs = append(playerIDs, grid.GetPlayersIDs()...)
-		if grid.GetPlayersIDs() != nil {
-			fmt.Println("==========>发现玩家 ： ", grid.GetPlayersIDs())
-		}
+		//if grid.GetPlayersIDs() != nil {
+		//	fmt.Println("==========>发现玩家 ： ", grid.GetPlayersIDs())
+		//}
 	}
 	return
 }

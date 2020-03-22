@@ -180,3 +180,19 @@ func (p *Player) GetSurroundingPlayers() (players []*Player) {
 	}
 	return
 }
+
+func (p *Player) Offline() {
+	//得到下线玩家 的周围玩家
+	players := p.GetSurroundingPlayers()
+	//周围玩家想自己的客户端发送 要下线玩家的信息
+	protomsg := &proto2.SyncPid{
+		Pid: p.Pid,
+	}
+	for _, player := range players {
+		player.SendMsg(201, protomsg)
+	}
+	//将下线的玩家从世界管理器中删除
+	WorldObj.Aoi.RemovePlayFromGridByPos(int(p.Pid), p.X, p.Z)
+	WorldObj.RemovePlayerByPid(p.Pid)
+
+}
