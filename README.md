@@ -1,6 +1,6 @@
 # ZinxProject
 
-- 后端服务器定义域
+- 后端服务器API设计
 
 - 使用服务器API、protobuf协议功能开发
 
