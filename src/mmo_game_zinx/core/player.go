@@ -57,9 +57,9 @@ func NewPlayer(conn ziface.IConn) *Player {
 	return &Player{
 		Pid:  id,
 		Conn: conn,
-		X:    float32(150 + rand.Intn(50)),
+		X:    float32(150 + rand.Intn(30)),
 		Y:    0,
-		Z:    float32(130 + rand.Intn(50)),
+		Z:    float32(130 + rand.Intn(30)),
 		V:    0,
 	}
 }
@@ -96,7 +96,7 @@ func (p *Player) Talk(content string) {
 	allPlayers := WorldObj.GetAllPlayers()
 	//发送
 	for _, play := range allPlayers {
-		go play.SendMsg(200, protoMsg)
+		play.SendMsg(200, protoMsg)
 	}
 }
 
@@ -143,4 +143,40 @@ func (p *Player) SyncSurrounding() {
 		Ps: players_proto_msg[:],
 	}
 	p.SendMsg(202, Syncplayers_proto)
+}
+
+//广播并跟新当前玩家的位置信息
+func (p *Player) UpdatePos(X float32, Y float32, Z float32, V float32) {
+	//更新当前玩家的坐标
+	p.X = X
+	p.Y = Y
+	p.Z = Z
+	p.V = V
+	//组件广播协议MsgID:200 tp:4
+	protomsg := &proto2.BroadCast{
+		Pid: p.Pid,
+		Tp:  4, //4 移动之后坐标信息更新
+		Data: &proto2.BroadCast_P{
+			P: &proto2.Position{
+				X: p.X,
+				Y: p.Y,
+				Z: p.Z,
+				V: p.V,
+			},
+		},
+	}
+	//获取玩家的周围玩家
+	players := p.GetSurroundingPlayers()
+	//周围玩家向自己的客户端发送当前玩家位置信息
+	for _, player := range players {
+		player.SendMsg(200, protomsg)
+	}
+}
+
+func (p *Player) GetSurroundingPlayers() (players []*Player) {
+	playerIDs := WorldObj.Aoi.GetPlayerIDsByPos(p.X, p.Z)
+	for _, pid := range playerIDs {
+		players = append(players, WorldObj.GetPlayerByID(int32(pid)))
+	}
+	return
 }

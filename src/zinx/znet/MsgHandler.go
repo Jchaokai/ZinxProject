@@ -76,8 +76,8 @@ func (msgHandle *MsgHandler) StartOneWorker(workerID int, taskQueue chan ziface.
 func (msgHandle *MsgHandler) SendMsgToTaskQueue(req ziface.IRequest) {
 	//将 消息平均分配（根据connID/ requestID）给不同的worker
 	workerID := req.GetConn().GetConnID() % msgHandle.WorkPoolSize
-	fmt.Printf("conn: %s connID: [%d] request is send to workerID : [%d] is solving\n",
-		req.GetConn().GetRemoteAddr().String(), req.GetConn().GetConnID(), workerID)
+	//fmt.Printf("conn: %s connID: [%d] request is send to workerID : [%d] is solving\n",
+	//	req.GetConn().GetRemoteAddr().String(), req.GetConn().GetConnID(), workerID)
 	//将request发送给对应的worker的taskQueue
 	msgHandle.TaskQueue[workerID] <- req
 }

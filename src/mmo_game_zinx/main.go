@@ -28,6 +28,6 @@ func main() {
 	//连接创建时的hook函数
 	server.SetOnConnStart(OnConn)
 	server.AddRouter(2, &apis.WorldChatRouter{})
-	//server.AddRouter(3,&apis.WorldChatRouter{})
+	server.AddRouter(3, &apis.MoveRouter{})
 	server.Server()
 }

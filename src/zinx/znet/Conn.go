@@ -62,8 +62,8 @@ func (c *Connection) StartReader() {
 			Msg.SetData(data)
 		}
 		//print完整的msg
-		fmt.Printf("Client-Handle Reader get Msg [ dataLen: %d | ID : %d | data : · · · · · · · · ·]\n",
-			Msg.GetMsgLen(), Msg.GetMsgID())
+		//fmt.Printf("Client-Handle Reader get Msg [ dataLen: %d | ID : %d | data : · · · · · · · · ·]\n",
+		//	Msg.GetMsgLen(), Msg.GetMsgID())
 		//得到request
 		request := &Request{
 			conn: c,
